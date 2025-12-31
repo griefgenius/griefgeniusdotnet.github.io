@@ -221,7 +221,7 @@
             <details open> 
                 <summary>recent motion</summary>
                 <div class="drawer-content">
-                    <span class="tagline">various posts, chronological</span>
+                    <span class="tagline">various projects, chronological</span>
                     <div id="feed-container">
                         <div id="loading" style="opacity: 0.5;">connecting to griefgeniuspostinggenie...</div>
                     </div>
@@ -251,13 +251,11 @@
 
         <div class="footer">
             <span>&copy; 2025</span>
-            <span><a href="thom@griefgenius.net">Contact</a>
-</span>
+            <span>contact</span>
         </div>
     </div>
 
-    <script>
-        // --- 1. SIGNATURE ---
+    <script>// --- 1. SIGNATURE ---
         console.log("%c grief genius \n %c log off, tune down, lock in. ", "font-size: 20px; font-weight: bold; background: #F2F0E9;", "color: #69b400;");
 
         // --- 2. CONFIG ---
@@ -297,28 +295,32 @@
             
             ctx.strokeStyle = level % 2 === 0 ? colorA : colorB;
             ctx.lineWidth = lineWidthFactor / level; 
-            ctx.globalAlpha = opacityFactor / Math.pow(level, 0.6); 
+            ctx.globalAlpha = opacityFactor / Math.pow(level, 0.3); 
             ctx.stroke();
 
             if (level < maxLevels) {
-                const nextRadius = radius * 0.33; 
+                const nextRadius = radius * 0.2; // Tighter recursion for the button
                 for (let i = 0; i < sides; i++) {
                     const theta = i * angleStep + rotationOffset;
                     const nextX = x + Math.cos(theta) * radius;
                     const nextY = y + Math.sin(theta) * radius;
-                    drawPoly(ctx, nextX, nextY, nextRadius, sides, level + 1, maxLevels, rotationOffset * -0.9, colorA, colorB, lineWidthFactor, opacityFactor);
+                    drawPoly(ctx, nextX, nextY, nextRadius, sides, level + 1, maxLevels, rotationOffset, colorA, colorB, lineWidthFactor, opacityFactor);
                 }
             }
         }
 
-        // --- 4. MINI HLSF (BUTTON) ---
+        // --- 4. BUTTON STATE ENGINE ---
         const btnCanvas = document.getElementById('btn-canvas');
         const btnCtx = btnCanvas.getContext('2d');
         let btnTime = 0;
-        let btnSpeed = 0.005; 
+        
+        let isPlaying = false;
+        let currentAudio = null;
+        const sounds = ['sounds/click.mp3', 'sounds/glitch.wav', 'sounds/static.mp3']; 
 
+        // --- 5. ANIMATION LOOP ---
         function animate() {
-            // A. MAIN CANVAS
+            // A. MAIN CANVAS (The Cloud)
             mainCtx.clearRect(0, 0, width, height);
             time += 0.0003; 
             const cx = width / 8;
@@ -327,30 +329,60 @@
             drawPoly(mainCtx, cx, cy, Math.min(width, height) * 0.40, 8, 1, 2, time, PALETTE.CELESTIAL, PALETTE.KERMIT, 28, 0.7);
             drawPoly(mainCtx, cx, cy, Math.min(width, height) * 0.45, 8, 1, 1, -time * 1.5, PALETTE.CELESTIAL, PALETTE.KERMIT, 28, 0.7);
 
-            // B. BUTTON CANVAS
+            // B. BUTTON CANVAS (The Icon)
             btnCtx.clearRect(0, 0, 100, 100);
-            btnTime += btnSpeed;
             
-            drawPoly(btnCtx, 50, 50, 40, 6, 1, 3, btnTime, PALETTE.INK, PALETTE.KERMIT, 2, 1.0);
+            // Only spin if playing, otherwise stand still (like a solid icon)
+            if(isPlaying) {
+                btnTime += 0.02; // Spin the Square
+            } else {
+                btnTime = 0; // Reset rotation for Triangle
+            }
+
+            if (isPlaying) {
+                // STOP SYMBOL: Square (4 sides), Rotated 45deg (PI/4) to sit flat
+                // Level 3 recursion gives it that "Tech" feel
+                drawPoly(btnCtx, 50, 50, 25, 4, 1, 3, btnTime + (Math.PI/4), PALETTE.INK, PALETTE.KERMIT, 3, 1.0);
+            } else {
+                // PLAY SYMBOL: Triangle (3 sides), Pointing Right (Angle 0)
+                // Level 3 recursion makes it look like a "Grief Genius" arrow
+                drawPoly(btnCtx, 50, 50, 25, 3, 1, 3, 0, PALETTE.INK, PALETTE.KERMIT, 3, 1.0);
+            }
             
             requestAnimationFrame(animate);
         }
         animate();
 
-        // --- 5. RANDOM SOUND ENGINE ---
+        // --- 6. INTERACTION ENGINE ---
         const playBtn = document.getElementById('play-trigger');
-        const sounds = ['sounds/click.mp3', 'sounds/glitch.wav', 'sounds/static.mp3']; 
         
         playBtn.addEventListener('click', () => {
-            btnSpeed = 0.05; 
-            setTimeout(() => { btnSpeed = 0.005; }, 500); 
+            if (isPlaying) {
+                // STOP LOGIC
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                isPlaying = false;
+            } else {
+                // PLAY LOGIC
+                if (!sounds.length) return;
+                
+                // Pick random sound
+                const file = sounds[Math.floor(Math.random() * sounds.length)];
+                currentAudio = new Audio(file);
+                
+                // Auto-reset when sound finishes
+                currentAudio.onended = () => {
+                    isPlaying = false;
+                };
 
-            if (!sounds.length) return;
-            const audio = new Audio(sounds[Math.floor(Math.random() * sounds.length)]);
-            audio.play();
+                currentAudio.play();
+                isPlaying = true;
+            }
         });
 
-        // --- 6. FEED ENGINE (LINKED TO YOUR FORM) ---
+        // --- 7. FEED ENGINE ---
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_-ll6bQFpl9Sw1ppGxJ-eiRXfDnCHCRrST9s5IAbsu8kZ4uX0h7kub3og6rImPDA3pekJryE961Uw/pub?gid=84760283&single=true&output=csv';
 
         async function loadFeed() {
@@ -362,22 +394,16 @@
                 box.innerHTML = '';
                 
                 rows.forEach(r => {
-                    // Smart Splitter
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     if(c.length < 5) return; 
                     
                     const clean = t => t ? t.replace(/^"|"$/g, '').trim() : "";
                     
-                    // --- MAPPING FORM RESPONSES ---
-                    // [0]=Timestamp, [1]=Untitled Question, [2]=Title, [3]=Link, [4]=Desc, [5]=Date
-                    
                     const title = clean(c[2]); 
                     let link = clean(c[3]);    
                     const desc = clean(c[4]);  
-                    // If Date (Col 5) is empty, use the Timestamp (Col 0)
                     const date = clean(c[5]) || clean(c[0]).split(' ')[0]; 
 
-                    // HTTPS Fixer
                     if (link && !link.match(/^https?:\/\//) && link.includes('.')) {
                         link = 'https://' + link;
                     }
