@@ -1,4 +1,261 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grief genius | multimodal collective</title>
+
+    <meta name="description" content="the only way through is throughout - a multimodal collective on planet earth">
+    <meta name="keywords" content="media collective, sound design, western mass, grief genius, moon mansion, galactic north, lofi, brutalism">
+    <meta name="author" content="Grief Genius">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://griefgenius.com/">
+    <meta property="og:title" content="grief genius | multimodal collective">
+    <meta property="og:description" content="the only way through is throughout - a multimodal collective on planet earth">
+    <meta property="og:image" content="cloud6.jpg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://griefgenius.com/">
+    <meta property="twitter:title" content="grief genius | multimodal collective">
+    <meta property="twitter:description" content="the only way through is throughout - a multimodal collective on planet earth">
+    <meta property="twitter:image" content="cloud6.jpg">
+
+    <link rel="icon" type="image/jpg" href="cloud6.jpg">
+
+    <style>
+        /* --- PALETTE --- */
+        :root {
+            --canvas: #F2F0E9;      /* Unbleached Paper */
+            --ink: #1A1A1A;         /* Soft Black */
+            --kermit: #69b400;      /* The Green */
+            --celestial: #088ec9;   /* The Blue */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--canvas);
+            color: var(--ink);
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        /* --- THE HLSF CANVAS (BACKGROUND) --- */
+        #hlsf-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0; 
+            pointer-events: none; 
+            opacity: 1.0; 
+        }
+
+        /* --- THE GRID --- */
+        .container {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            min-height: 100vh;
+            border: 2px solid var(--ink);
+            margin: 20px;
+            background: rgba(242, 240, 233, 0.4); 
+            backdrop-filter: blur(2px); 
+        }
+
+        /* --- HEADER --- */
+        .header {
+            grid-column: 1 / span 8;
+            padding: 40px;
+            border-bottom: 2px solid var(--ink);
+            border-right: 2px solid var(--ink);
+        }
+
+        .symbol {
+            grid-column: 9 / span 4;
+            background-color: var(--celestial);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid var(--ink);
+            position: relative; /* For the mini canvas positioning */
+        }
+
+        /* PLAY BUTTON CONTAINER */
+        .circle {
+            width: 100px; height: 100px;
+            background-color: var(--canvas);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.3s ease;
+            user-select: none;
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden; /* Clips the mini canvas to a circle */
+        }
+        .circle:hover { transform: scale(1.1); }
+        .circle:active { transform: scale(0.95); }
+
+        /* THE MINI BUTTON CANVAS */
+        #btn-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* --- LEFT COL --- */
+        .manifesto {
+            grid-column: 1 / span 4;
+            grid-row: 2;
+            padding: 40px;
+            border-right: 2px solid var(--ink);
+            background-color: var(--kermit);
+            color: var(--canvas);
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        /* --- RIGHT COL --- */
+        .archive-section {
+            grid-column: 5 / span 8;
+            grid-row: 2;
+            padding: 0; 
+        }
+
+        /* --- DRAWERS --- */
+        details {
+            border-bottom: 1px solid var(--ink);
+            padding: 20px 40px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        details:hover { background-color: rgba(255,255,255,0.3); }
+        details[open] { background-color: rgba(255,255,255,0.8); }
+
+        summary {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 2rem; font-weight: bold;
+            list-style: none; display: flex; justify-content: space-between; align-items: center;
+        }
+        summary::after { content: "+"; font-weight: normal; }
+        details[open] summary::after { content: "-"; }
+
+        .drawer-content { padding-top: 20px; font-size: 1rem; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- FEED STYLING --- */
+        .entry { margin-bottom: 25px; border-left: 2px solid var(--kermit); padding-left: 15px; }
+        .entry-date { font-size: 0.75rem; font-weight: bold; opacity: 0.5; margin-bottom: 4px; }
+        .entry-title a { font-family: 'Helvetica', sans-serif; font-size: 1.2rem; font-weight: bold; color: var(--celestial); text-decoration: none; text-transform: uppercase; }
+        .entry-title a:hover { background-color: var(--celestial); color: #fff; }
+        .entry-desc { margin-top: 5px; font-size: 0.9rem; white-space: pre-wrap; }
+
+        /* --- FOOTER --- */
+        .footer {
+            grid-column: 1 / -1;
+            border-top: 2px solid var(--ink);
+            padding: 20px;
+            font-family: 'Helvetica', sans-serif;
+            display: flex; justify-content: space-between;
+        }
+
+        h1 { font-family: 'Helvetica', sans-serif; font-size: 4rem; line-height: 0.9; letter-spacing: -2px;}
+        
+        @media (max-width: 768px) {
+            .container { display: flex; flex-direction: column; }
+            .header, .symbol, .manifesto, .archive-section { border-right: none; border-bottom: 2px solid var(--ink); }
+        }
+        
+        /* --- DARK MODE --- */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --canvas: #050505;      
+                --ink: #e6e4dc;         
+                --kermit: #79d400;      
+                --celestial: #29b4ff;   
+            }
+            .container {
+                background: rgba(10, 10, 10, 0.6); 
+                border-color: var(--ink);
+            }
+            details:hover { background-color: rgba(255,255,255,0.1); }
+            details[open] { background-color: rgba(255,255,255,0.15); }
+            
+            .circle {
+                background-color: var(--ink); 
+                color: var(--canvas);         
+                box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
+            }
+            #hlsf-canvas { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="hlsf-canvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <h1>grief<br>genius</h1>
+            <p style="margin-top: 20px;">turtle island // east coast </p>
+        </div>
+
+        <div class="symbol">
+            <div class="circle" id="play-trigger">
+                <canvas id="btn-canvas" width="100" height="100"></canvas>
+            </div>
+        </div>
+
+        <div class="manifesto">
+            <div>
+                <p><strong>brief dreams, grief genie.</strong></p>
+                <p>a multimodal collective <br> the only way through <br> is throughout <br> </p>
+            </div>
+            <div style="margin-top: 40px; font-size: 0.9rem; opacity: 0.8;">
+                <p> the inertia of space <br> leaves actions of space <br> speaking foreign language <br> to silence </p>
+            </div>
+        </div>
+
+        <div class="archive-section">
+            <details open> 
+                <summary>recent motion</summary>
+                <div class="drawer-content">
+                    <span class="tagline">various projects, chronological</span>
+                    <div id="feed-container">
+                        <div id="loading" style="opacity: 0.5;">connecting to griefgeniuspostinggenie...</div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>galactic north records</summary>
+                <div class="drawer-content">
+                    <span class="tagline">a stellar record label</span>
+                    <div style="background: var(--celestial); color: white; padding: 20px; text-align: center; margin-top: 20px;">
+                        <a href="https://www.galacticnorthrecords.com" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">www.galacticnorthrecords.com</a>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>services // protocols</summary>
+                <div class="drawer-content">
+                    <p>offering multi-modal production support scaled to the notion, scope, and dream of the work.</p>
+                    <div style="margin-top:20px; padding:10px; border:1px dashed var(--ink);">
+                         <strong>>> ADJUSTABLE SCALE</strong>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="footer">
+            <span>&copy; 2025</span>
+            <span>contact</span>
+        </div>
+    </div>
+
+    <script>
         // --- 1. SIGNATURE ---
         console.log("%c grief genius \n %c log off, tune down, lock in. ", "font-size: 20px; font-weight: bold; background: #F2F0E9;", "color: #69b400;");
 
@@ -141,3 +398,5 @@
         }
         loadFeed();
     </script>
+</body>
+</html>
