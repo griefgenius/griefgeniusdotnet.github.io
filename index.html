@@ -144,397 +144,84 @@
         .drawer-content { padding-top: 20px; font-size: 1rem; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- NEW VISUAL CARD FEED STYLING --- */
-        .motion-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
+        /* --- FEED STYLING (TEXT ONLY + SCROLLABLE) --- */
+        .feed-container {
             margin-top: 20px;
-        }
-
-        .motion-card {
-            background: var(--ink); /* Dark Card */
-            color: var(--canvas);   /* Light Text */
-            border: 1px solid var(--ink);
             display: flex;
             flex-direction: column;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            text-decoration: none; /* In case the whole card is a link */
-        }
-
-        .motion-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0px var(--kermit); /* Brutalist shadow */
-        }
-
-        .card-image {
-            width: 100%;
-            height: 200px;
-            background-color: #333;
-            object-fit: cover;
-            border-bottom: 1px solid var(--canvas);
-            filter: grayscale(100%); /* Lofi vibe */
-            transition: filter 0.3s ease;
+            gap: 15px;
+            
+            /* THE SCROLL FIX: */
+            max-height: 500px;      /* Limits height so it doesn't stretch page */
+            overflow-y: auto;       /* Adds scrollbar if content is too long */
+            padding-right: 10px;    /* Space for scrollbar */
+            
+            /* Scrollbar styling for Chrome/Safari/Edge */
+            scrollbar-width: thin;
+            scrollbar-color: var(--kermit) transparent;
         }
         
-        .motion-card:hover .card-image {
-            filter: grayscale(0%); /* Color on hover */
+        /* Custom Scrollbar Webkit */
+        .feed-container::-webkit-scrollbar { width: 6px; }
+        .feed-container::-webkit-scrollbar-track { background: transparent; }
+        .feed-container::-webkit-scrollbar-thumb { background-color: var(--kermit); border-radius: 3px; }
+
+        .entry { 
+            margin-bottom: 10px; 
+            border-left: 4px solid var(--kermit); 
+            padding-left: 20px; 
+            padding-top: 5px;
+            padding-bottom: 5px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .entry:hover {
+            border-left-color: var(--celestial); 
         }
 
-        .card-content {
-            padding: 20px;
-        }
-
-        .card-meta {
+        .entry-date { 
             font-family: 'Courier New', monospace;
-            font-size: 0.75rem;
-            color: var(--kermit);
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            opacity: 0.6; 
+            margin-bottom: 4px; 
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            display: block;
         }
 
-        .card-title {
-            font-family: 'Helvetica', sans-serif;
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #fff;
-            margin: 0 0 10px 0;
+        .entry-title {
+            margin-bottom: 5px;
+        }
+
+        /* Link Styling */
+        .entry-title a { 
+            font-family: 'Helvetica', sans-serif; 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            color: var(--ink); 
+            text-decoration: none; 
+            text-transform: uppercase; 
+            line-height: 1.1;
+        }
+        .entry-title a:hover { 
+            background-color: var(--celestial); 
+            color: #fff; 
+        }
+
+        /* Text Only Styling */
+        .entry-title span {
+            font-family: 'Helvetica', sans-serif; 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            color: var(--ink); 
+            text-transform: uppercase; 
             line-height: 1.1;
         }
 
-        .card-excerpt {
-            color: #ccc;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin: 0;
-        }
-
-        /* Highlight the newest post */
-        .motion-card:first-child {
-            border: 2px solid var(--kermit);
+        .entry-desc { 
+            margin-top: 5px; 
+            font-size: 0.95rem; 
+            white-space: pre-wrap; 
+            max-width: 90%;
         }
         
-        .motion-card:first-child .card-meta::after {
-            content: " // NEW_SIGNAL";
-            color: #fff;
-            background: var(--kermit);
-            padding: 2px 4px;
-            margin-left: 10px;
-            font-size: 0.6rem;
-        }
-
-        /* --- FOOTER --- */
-        .footer {
-            grid-column: 1 / -1;
-            border-top: 2px solid var(--ink);
-            padding: 20px;
-            font-family: 'Helvetica', sans-serif;
-            display: flex; justify-content: space-between;
-        }
-
-        h1 { font-family: 'Helvetica', sans-serif; font-size: 4rem; line-height: 0.9; letter-spacing: -2px;}
-        
-        @media (max-width: 768px) {
-            .container { display: flex; flex-direction: column; }
-            .header, .symbol, .manifesto, .archive-section { border-right: none; border-bottom: 2px solid var(--ink); }
-        }
-        
-        /* --- DARK MODE --- */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --canvas: #050505;      
-                --ink: #e6e4dc;         
-                --kermit: #79d400;      
-                --celestial: #29b4ff;   
-            }
-            .container {
-                background: rgba(10, 10, 10, 0.6); 
-                border-color: var(--ink);
-            }
-            details:hover { background-color: rgba(255,255,255,0.1); }
-            details[open] { background-color: rgba(255,255,255,0.15); }
-            
-            .circle {
-                background-color: var(--ink); 
-                color: var(--canvas);         
-                box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
-            }
-            #hlsf-canvas { opacity: 0.8; }
-            
-            /* Dark mode tweaks for cards */
-            .motion-card { border: 1px solid #333; }
-            .card-title { color: var(--ink); }
-            .card-excerpt { color: #999; }
-        }
-    </style>
-</head>
-<body>
-
-    <canvas id="hlsf-canvas"></canvas>
-
-    <div class="container">
-        <div class="header">
-            <h1>grief<br>genius</h1>
-            <p style="margin-top: 20px;">turtle island // east coast </p>
-        </div>
-
-        <div class="symbol">
-            <div class="circle" id="play-trigger">
-                <canvas id="btn-canvas" width="100" height="100"></canvas>
-            </div>
-        </div>
-
-        <div class="manifesto">
-            <div>
-                <p><strong>brief dreams, grief genie.</strong></p>
-                <p>a multimodal collective <br> the only way through <br> is throughout <br> </p>
-            </div>
-            <div style="margin-top: 40px; font-size: 0.9rem; opacity: 0.8;">
-                <p> </p>
-            </div>
-        </div>
-
-        <div class="archive-section">
-            <details open> 
-                <summary>recent motion</summary>
-                <div class="drawer-content">
-                    <span class="tagline">visual feed // newest on top</span>
-                    
-                    <div class="motion-feed">
-                        
-                        <article class="motion-card">
-                            <img src="https://placehold.co/600x400/222/555?text=System+Update" alt="Latest Update" class="card-image">
-                            <div class="card-content">
-                                <span class="card-meta">Dec 23, 2025</span>
-                                <h3 class="card-title">System Refactor</h3>
-                                <p class="card-excerpt">Complete overhaul of the backend logic. We stripped the unnecessary dependencies and focused on raw speed. The grid is now responsive.</p>
-                            </div>
-                        </article>
-
-                        <article class="motion-card">
-                            <img src="https://placehold.co/600x400/333/666?text=Blueprints" alt="Sketches" class="card-image">
-                            <div class="card-content">
-                                <span class="card-meta">Dec 15, 2025</span>
-                                <h3 class="card-title">Initial Sketches</h3>
-                                <p class="card-excerpt">Drafting the visual language for the new interface. Focusing on high contrast and utilitarian typography. Brutalist frameworks.</p>
-                            </div>
-                        </article>
-
-                        <article class="motion-card">
-                            <img src="https://placehold.co/600x400/444/777?text=Concept" alt="Concept" class="card-image">
-                            <div class="card-content">
-                                <span class="card-meta">Nov 30, 2025</span>
-                                <h3 class="card-title">Concept Zero</h3>
-                                <p class="card-excerpt">The beginning of the motion. Defining the scope and the primary objectives for the upcoming quarter.</p>
-                            </div>
-                        </article>
-
-                    </div>
-                    </div>
-            </details>
-
-            <details>
-                <summary>galactic north records</summary>
-                <div class="drawer-content">
-                    <span class="tagline">a stellar record label</span>
-                    <div style="background: var(--celestial); color: white; padding: 20px; text-align: center; margin-top: 20px;">
-                        <a href="https://www.galacticnorthrecords.com" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">www.galacticnorthrecords.com</a>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>services // protocols</summary>
-                <div class="drawer-content">
-                    <p>offering multi-modal production support scaled to the notion, scope, and dream of the work.</p>
-                    <div style="margin-top:20px; padding:10px; border:1px dashed var(--ink);">
-                         <strong>>> ADJUSTABLE SCALE</strong>
-                    </div>
-                </div>
-            </details>
-        </div>
-
-        <div class="footer">
-            <span>&copy; 2025</span>
-            <span>contact</span>
-        </div>
-    </div>
-
-    <script>// --- 1. SIGNATURE ---
-        console.log("%c grief genius \n %c log off, tune down, lock in. ", "font-size: 20px; font-weight: bold; background: #F2F0E9;", "color: #69b400;");
-
-        // --- 2. CONFIG ---
-        const PALETTE = {
-            KERMIT: '#69b400',       
-            CELESTIAL: '#088ec9',    
-            INK: '#1A1A1A'        
-        };
-
-        // --- 3. MAIN HLSF (BACKGROUND) ---
-        const mainCanvas = document.getElementById('hlsf-canvas');
-        const mainCtx = mainCanvas.getContext('2d');
-        let width, height;
-        let time = 0;
-
-        function resize() {
-            width = mainCanvas.width = window.innerWidth;
-            height = mainCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        function drawPoly(ctx, x, y, radius, sides, level, maxLevels, rotationOffset, colorA, colorB, lineWidthFactor, opacityFactor) {
-            if (level > maxLevels || radius < 1) return;
-
-            ctx.beginPath();
-            const angleStep = (Math.PI * 2) / sides;
-            
-            for (let i = 0; i < sides; i++) {
-                const theta = i * angleStep + rotationOffset;
-                const px = x + Math.cos(theta) * radius;
-                const py = y + Math.sin(theta) * radius;
-                if (i === 0) ctx.moveTo(px, py);
-                else ctx.lineTo(px, py);
-            }
-            ctx.closePath();
-            
-            ctx.strokeStyle = level % 2 === 0 ? colorA : colorB;
-            ctx.lineWidth = lineWidthFactor / level; 
-            ctx.globalAlpha = opacityFactor / Math.pow(level, 0.3); 
-            ctx.stroke();
-
-            if (level < maxLevels) {
-                const nextRadius = radius * 0.2; // Tighter recursion for the button
-                for (let i = 0; i < sides; i++) {
-                    const theta = i * angleStep + rotationOffset;
-                    const nextX = x + Math.cos(theta) * radius;
-                    const nextY = y + Math.sin(theta) * radius;
-                    drawPoly(ctx, nextX, nextY, nextRadius, sides, level + 1, maxLevels, rotationOffset, colorA, colorB, lineWidthFactor, opacityFactor);
-                }
-            }
-        }
-
-        // --- 4. BUTTON STATE ENGINE ---
-        const btnCanvas = document.getElementById('btn-canvas');
-        const btnCtx = btnCanvas.getContext('2d');
-        let btnTime = 0;
-        
-        let isPlaying = false;
-        let currentAudio = null;
-        const sounds = ['sounds/click.mp3', 'sounds/glitch.wav', 'sounds/static.mp3']; 
-
-        // --- 5. ANIMATION LOOP ---
-        function animate() {
-            // A. MAIN CANVAS (The Cloud)
-            mainCtx.clearRect(0, 0, width, height);
-            time += 0.0003; 
-            const cx = width / 8;
-            const cy = height / 8;
-            
-            drawPoly(mainCtx, cx, cy, Math.min(width, height) * 0.40, 8, 1, 2, time, PALETTE.CELESTIAL, PALETTE.KERMIT, 28, 0.7);
-            drawPoly(mainCtx, cx, cy, Math.min(width, height) * 0.45, 8, 1, 1, -time * 1.5, PALETTE.CELESTIAL, PALETTE.KERMIT, 28, 0.7);
-
-            // B. BUTTON CANVAS (The Icon)
-            btnCtx.clearRect(0, 0, 100, 100);
-            
-            // Only spin if playing, otherwise stand still (like a solid icon)
-            if(isPlaying) {
-                btnTime += 0.02; // Spin the Square
-            } else {
-                btnTime = 0; // Reset rotation for Triangle
-            }
-
-            if (isPlaying) {
-                // STOP SYMBOL: Square (4 sides), Rotated 45deg (PI/4) to sit flat
-                // Level 3 recursion gives it that "Tech" feel
-                drawPoly(btnCtx, 50, 50, 25, 4, 1, 3, btnTime + (Math.PI/4), PALETTE.INK, PALETTE.KERMIT, 3, 1.0);
-            } else {
-                // PLAY SYMBOL: Triangle (3 sides), Pointing Right (Angle 0)
-                // Level 3 recursion makes it look like a "Grief Genius" arrow
-                drawPoly(btnCtx, 50, 50, 25, 3, 1, 3, 0, PALETTE.INK, PALETTE.KERMIT, 3, 1.0);
-            }
-            
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // --- 6. INTERACTION ENGINE ---
-        const playBtn = document.getElementById('play-trigger');
-        
-        playBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                // STOP LOGIC
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                }
-                isPlaying = false;
-            } else {
-                // PLAY LOGIC
-                if (!sounds.length) return;
-                
-                // Pick random sound
-                const file = sounds[Math.floor(Math.random() * sounds.length)];
-                currentAudio = new Audio(file);
-                
-                // Auto-reset when sound finishes
-                currentAudio.onended = () => {
-                    isPlaying = false;
-                };
-
-                currentAudio.play();
-                isPlaying = true;
-            }
-        });
-
-        // --- 7. FEED ENGINE ---
-        // NOTE: I HAVE PAUSED THIS SCRIPT SINCE WE ARE USING HARDCODED CARDS NOW.
-        // UNCOMMENT IT IF YOU WANT TO RETURN TO THE CSV LIST.
-        /*
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_-ll6bQFpl9Sw1ppGxJ-eiRXfDnCHCRrST9s5IAbsu8kZ4uX0h7kub3og6rImPDA3pekJryE961Uw/pub?gid=84760283&single=true&output=csv';
-
-        async function loadFeed() {
-            try {
-                const res = await fetch(sheetUrl);
-                const txt = await res.text();
-                const rows = txt.split('\n').slice(1);
-                const box = document.getElementById('feed-container');
-                box.innerHTML = '';
-                
-                rows.forEach(r => {
-                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    if(c.length < 5) return; 
-                    
-                    const clean = t => t ? t.replace(/^"|"$/g, '').trim() : "";
-                    
-                    const title = clean(c[2]); 
-                    let link = clean(c[3]);    
-                    const desc = clean(c[4]);  
-                    const date = clean(c[5]) || clean(c[0]).split(' ')[0]; 
-
-                    if (link && !link.match(/^https?:\/\//) && link.includes('.')) {
-                        link = 'https://' + link;
-                    }
-
-                    const html = `
-                        <div class="entry">
-                            <div class="entry-date">${date}</div>
-                            <div class="entry-title"><a href="${link}" target="_blank">${title}</a></div>
-                            <div class="entry-desc">${desc}</div>
-                        </div>
-                    `;
-                    
-                    if(title && link) box.innerHTML += html;
-                });
-            } catch(e) { 
-                console.log(e);
-                document.getElementById('loading').innerText = 'signal lost.'; 
-            }
-        }
-        loadFeed(); 
-        */
-    </script>
-</body>
-</html>
+        /* Highlight for the First Item (Newest) */
