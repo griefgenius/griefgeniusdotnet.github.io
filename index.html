@@ -320,7 +320,7 @@
                 <div class="drawer-content">
                     <span class="tagline">a stellar record label</span>
                     <div style="background: var(--celestial); color: white; padding: 20px; text-align: center; margin-top: 20px;">
-                        <a href="https://www.galacticnorthrecords.com" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">www.galacticnorthrecords.com</a>
+                        <a href="https://www.galacticnorthrecords.com" target="https://www.galacticnorthrecords.com" style="color: white; text-decoration: none; font-weight: bold;">www.galacticnorthrecords.com</a>
                     </div>
                 </div>
             </details>
@@ -405,7 +405,21 @@
         let isPlaying = false;
         let currentAudio = null;
         
-        const sounds = [,'Dandelion.wav' 'Dead Butterfly.wav', 'Figure8.wav', 'Forcythia.wav', 'My kids are getting too big.wav', 'Outdoors night August.wav', 'Recording 116.wav', 'Recording 76.wav', 'Something sweet.wav', 'futurechocolate.mp3']; 
+        // --- FIXED SOUND ARRAY ---
+        // 1. Added "sounds/" prefix to all paths
+        // 2. Added commas between all items
+        const sounds = [
+            'sounds/Dandelion.wav',
+            'sounds/Dead Butterfly.wav',
+            'sounds/Figure8.wav',
+            'sounds/Forcythia.wav',
+            'sounds/My kids are getting too big.wav',
+            'sounds/Outdoors night August.wav',
+            'sounds/Recording 116.wav',
+            'sounds/Recording 76.wav',
+            'sounds/Something sweet.wav',
+            'sounds/futurechocolate.mp3'
+        ]; 
 
         // --- 5. ANIMATION LOOP ---
         function animate() {
@@ -417,6 +431,7 @@
             drawPoly(mainCtx, cx, cy, Math.min(width, height) * 0.40, 8, 1, 2, time, PALETTE.CELESTIAL, PALETTE.KERMIT, 28, 0.7);
             drawPoly(mainCtx, cx, cy, Math.min(width, height) * 0.45, 8, 1, 1, -time * 1.5, PALETTE.CELESTIAL, PALETTE.KERMIT, 28, 0.7);
 
+            // SMEAR SETTING (User Preferred)
             btnCtx.clearRect(0.7, 100, 100, 100);
             
             if(isPlaying) {
@@ -447,22 +462,32 @@
                 isPlaying = false;
             } else {
                 if (!sounds.length) return;
-                const file = sounds[Math.floor(Math.random() * sounds.length)];
-                currentAudio = new Audio(file);
+                
+                // Pick random file
+                const filename = sounds[Math.floor(Math.random() * sounds.length)];
+                currentAudio = new Audio(filename);
+                
+                // Error Logging
+                currentAudio.addEventListener('error', function(e) {
+                    console.error("AUDIO ERROR: Could not load file:", filename);
+                    console.log("Check case sensitivity (e.g. 'File.wav' vs 'file.wav') in your GitHub folder.");
+                    isPlaying = false; 
+                });
+
                 currentAudio.onended = () => { isPlaying = false; };
-                currentAudio.play();
+                
+                currentAudio.play().catch(e => console.log("Audio play blocked:", e));
                 isPlaying = true;
             }
         });
 
-        // --- 7. FEED ENGINE (UPDATED WITH TEXT FIX & REVERSE) ---
+        // --- 7. FEED ENGINE ---
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_-ll6bQFpl9Sw1ppGxJ-eiRXfDnCHCRrST9s5IAbsu8kZ4uX0h7kub3og6rImPDA3pekJryE961Uw/pub?gid=84760283&single=true&output=csv';
 
         async function loadFeed() {
             try {
                 const res = await fetch(sheetUrl);
                 const txt = await res.text();
-                // NOTE: Added .reverse() so newest spreadsheet rows appear FIRST (top)
                 const rows = txt.split('\n').slice(1).reverse();
                 
                 const box = document.getElementById('feed-container');
@@ -479,12 +504,10 @@
                     const desc = clean(c[4]);  
                     const date = clean(c[5]) || clean(c[0]).split(' ')[0]; 
 
-                    // FIX 1: HTTPS Force
                     if (link && !link.match(/^https?:\/\//) && link.includes('.')) {
                         link = 'https://' + link;
                     }
 
-                    // FIX 2: Text vs Link Logic
                     let titleHtml = '';
                     if (link) {
                         titleHtml = `<a href="${link}" target="_blank">${title}</a>`;
