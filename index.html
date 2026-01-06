@@ -144,12 +144,86 @@
         .drawer-content { padding-top: 20px; font-size: 1rem; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- FEED STYLING --- */
-        .entry { margin-bottom: 25px; border-left: 2px solid var(--kermit); padding-left: 15px; }
-        .entry-date { font-size: 0.75rem; font-weight: bold; opacity: 0.5; margin-bottom: 4px; }
-        .entry-title a { font-family: 'Helvetica', sans-serif; font-size: 1.2rem; font-weight: bold; color: var(--celestial); text-decoration: none; text-transform: uppercase; }
-        .entry-title a:hover { background-color: var(--celestial); color: #fff; }
-        .entry-desc { margin-top: 5px; font-size: 0.9rem; white-space: pre-wrap; }
+        /* --- NEW VISUAL CARD FEED STYLING --- */
+        .motion-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .motion-card {
+            background: var(--ink); /* Dark Card */
+            color: var(--canvas);   /* Light Text */
+            border: 1px solid var(--ink);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none; /* In case the whole card is a link */
+        }
+
+        .motion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px var(--kermit); /* Brutalist shadow */
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background-color: #333;
+            object-fit: cover;
+            border-bottom: 1px solid var(--canvas);
+            filter: grayscale(100%); /* Lofi vibe */
+            transition: filter 0.3s ease;
+        }
+        
+        .motion-card:hover .card-image {
+            filter: grayscale(0%); /* Color on hover */
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-meta {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--kermit);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .card-title {
+            font-family: 'Helvetica', sans-serif;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+            margin: 0 0 10px 0;
+            line-height: 1.1;
+        }
+
+        .card-excerpt {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* Highlight the newest post */
+        .motion-card:first-child {
+            border: 2px solid var(--kermit);
+        }
+        
+        .motion-card:first-child .card-meta::after {
+            content: " // NEW_SIGNAL";
+            color: #fff;
+            background: var(--kermit);
+            padding: 2px 4px;
+            margin-left: 10px;
+            font-size: 0.6rem;
+        }
 
         /* --- FOOTER --- */
         .footer {
@@ -188,6 +262,11 @@
                 box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
             }
             #hlsf-canvas { opacity: 0.8; }
+            
+            /* Dark mode tweaks for cards */
+            .motion-card { border: 1px solid #333; }
+            .card-title { color: var(--ink); }
+            .card-excerpt { color: #999; }
         }
     </style>
 </head>
@@ -221,11 +300,39 @@
             <details open> 
                 <summary>recent motion</summary>
                 <div class="drawer-content">
-                    <span class="tagline">various posts, chronological</span>
-                    <div id="feed-container">
-                        <div id="loading" style="opacity: 0.5;">connecting to griefgeniuspostinggenie...</div>
+                    <span class="tagline">visual feed // newest on top</span>
+                    
+                    <div class="motion-feed">
+                        
+                        <article class="motion-card">
+                            <img src="https://placehold.co/600x400/222/555?text=System+Update" alt="Latest Update" class="card-image">
+                            <div class="card-content">
+                                <span class="card-meta">Dec 23, 2025</span>
+                                <h3 class="card-title">System Refactor</h3>
+                                <p class="card-excerpt">Complete overhaul of the backend logic. We stripped the unnecessary dependencies and focused on raw speed. The grid is now responsive.</p>
+                            </div>
+                        </article>
+
+                        <article class="motion-card">
+                            <img src="https://placehold.co/600x400/333/666?text=Blueprints" alt="Sketches" class="card-image">
+                            <div class="card-content">
+                                <span class="card-meta">Dec 15, 2025</span>
+                                <h3 class="card-title">Initial Sketches</h3>
+                                <p class="card-excerpt">Drafting the visual language for the new interface. Focusing on high contrast and utilitarian typography. Brutalist frameworks.</p>
+                            </div>
+                        </article>
+
+                        <article class="motion-card">
+                            <img src="https://placehold.co/600x400/444/777?text=Concept" alt="Concept" class="card-image">
+                            <div class="card-content">
+                                <span class="card-meta">Nov 30, 2025</span>
+                                <h3 class="card-title">Concept Zero</h3>
+                                <p class="card-excerpt">The beginning of the motion. Defining the scope and the primary objectives for the upcoming quarter.</p>
+                            </div>
+                        </article>
+
                     </div>
-                </div>
+                    </div>
             </details>
 
             <details>
@@ -383,6 +490,9 @@
         });
 
         // --- 7. FEED ENGINE ---
+        // NOTE: I HAVE PAUSED THIS SCRIPT SINCE WE ARE USING HARDCODED CARDS NOW.
+        // UNCOMMENT IT IF YOU WANT TO RETURN TO THE CSV LIST.
+        /*
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_-ll6bQFpl9Sw1ppGxJ-eiRXfDnCHCRrST9s5IAbsu8kZ4uX0h7kub3og6rImPDA3pekJryE961Uw/pub?gid=84760283&single=true&output=csv';
 
         async function loadFeed() {
@@ -423,7 +533,8 @@
                 document.getElementById('loading').innerText = 'signal lost.'; 
             }
         }
-        loadFeed();
+        loadFeed(); 
+        */
     </script>
 </body>
 </html>
